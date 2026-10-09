@@ -21,8 +21,35 @@
  *     - any allocation fails
  */
 static int** alloc2d(int rows, int cols) {
-    /* TODO */
-    return NULL;
+    static int** alloc2d(int rows, int cols) {
+    if (rows <= 0 || cols <= 0) {
+        return NULL;
+    }
+
+    /* Allocate the array of row pointers */
+    int** grid = malloc(sizeof(int*) * rows);
+
+    if (grid == NULL) {
+        return NULL;
+    }
+
+    /* Allocate each row separately */
+    for (int i = 0; i < rows; i++) {
+        grid[i] = malloc(sizeof(int) * cols);
+
+        if (grid[i] == NULL) {
+            /* Free any rows that were successfully allocated */
+            for (int j = 0; j < i; j++) {
+                free(grid[j]);
+            }
+
+            free(grid);
+            return NULL;
+        }
+    }
+
+    return grid;
+}
 }
 
 /*
@@ -40,7 +67,7 @@ static int** alloc2d(int rows, int cols) {
  */
 static void free2d(int** a, int rows) { /* TODO */ }
 
-static void die_bad_row(int r, int rows) {
+static void error_bad_row(int r, int rows) {
     fprintf(stderr, "ERROR: row index out of bounds: r=%d for rows=%d\n", r,
             rows);
     exit(1);
